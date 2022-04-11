@@ -1,0 +1,6 @@
+gspread
+PyGithub
+pandas
+python-dotenv
+slack_sdk
+oauth2client
