@@ -1,5 +1,7 @@
 import os
 import datetime
+from tracemalloc import start
+from pytz import timezone
 import time
 from pathlib import Path
 
@@ -29,8 +31,12 @@ class SlackClient:
         return display_name if display_name != '' else real_name
 
     def get_channel_messages(self, channel_id, start_date, end_date):
-        start_time = time.mktime(datetime.datetime.strptime(start_date, '%Y-%m-%d').timetuple())
-        end_time = time.mktime(datetime.datetime.strptime(end_date, '%Y-%m-%d').timetuple())
+        start_time = datetime.datetime.strptime(start_date, '%Y-%m-%d')
+        start_time = datetime.datetime(start_time.year, start_time.month, start_time.day, 0, 0, 0)
+        start_time = time.mktime(start_time.timetuple())
+        end_time = datetime.datetime.strptime(end_date, '%Y-%m-%d')
+        end_time = datetime.datetime(end_time.year, end_time.month, end_time.day, 23, 59, 59)
+        end_time = time.mktime(end_time.timetuple())
         response = self.client.conversations_history(channel=channel_id, oldest=start_time, latest=end_time)
         return response.data['messages']
 
