@@ -13,7 +13,7 @@ pip install -r requirements.txt
 슬랙 봇 토큰은 슬랙 API의 앱 관리에서 "OAuth & Permissions > OAuth Tokens for Your Workspace"에서 확인하실 수 있습니다.
 
 참고 링크) https://miaow-miaow.tistory.com/148
-​
+
 구글 스프레드 시트 API를 활용하기 위한 사전 작업은 아래 참고 링크의 "For Bots: Using Service Account" 내용을 참고하시면 됩니다.
 과정을 따라가다 보면 json 형태의 credential 파일을 다운로드받을 수 있습니다.
 
