@@ -4,3 +4,5 @@ pandas
 python-dotenv
 slack_sdk
 oauth2client
+bs4
+requests
