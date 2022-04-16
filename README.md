@@ -18,7 +18,7 @@ pip install -r requirements.txt
 과정을 따라가다 보면 json 형태의 credential 파일을 다운로드받을 수 있습니다.
 
 참고 링크) https://docs.gspread.org/en/latest/oauth2.html#enable-api-access-for-a-project
-​
+
 root 경로에 .env 파일을 생성한 다음 슬랙 봇 토큰과 json 포맷의 credential 파일을 참고해서 아래 정보를 기입해주세요.
 ```
 SLACK_BOT_TOKEN=<슬랙 봇 토큰>
