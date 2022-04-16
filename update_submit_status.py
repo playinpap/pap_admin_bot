@@ -20,7 +20,7 @@ pass_member_ids = slack_client.get_emoji_used_member_ids(
     channel_id=publisher_channel_id, start_date=beginning_date, end_date=due_date, emoji_name='pass')
 
 google_sheet_client = GoogelSheetClient()
-worksheet = google_sheet_client.get_worksheet()
+worksheet = google_sheet_client.get_worksheet('제출현황')
 data = pd.DataFrame(worksheet.get_all_records())
 data.loc[(data['slackID'].isin(submit_member_ids)) & (data['제출기한'] == due_date), '제출여부'] = 'Y'
 data.loc[(~data['slackID'].isin(submit_member_ids)) & (data['제출기한'] == due_date), '제출여부'] = 'N'

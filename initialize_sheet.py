@@ -36,6 +36,6 @@ for submission_date in submission_dates:
     }))
 df = pd.concat(dataframes)
 google_sheet_client = GoogelSheetClient()
-worksheet = google_sheet_client.get_worksheet()
+worksheet = google_sheet_client.get_worksheet('제출현황')
 worksheet.update([df.columns.values.tolist()] + df.values.tolist())
 print('complete!')

@@ -25,5 +25,5 @@ class GoogelSheetClient:
         }
         self.client = gspread.service_account_from_dict(credentials)
 
-    def get_worksheet(self):
-        return self.client.open(os.environ.get('SPREADSHEET_NAME')).worksheet(os.environ.get('WORKSHEET_NAME'))
+    def get_worksheet(self, worksheet_name):
+        return self.client.open(os.environ.get('SPREADSHEET_NAME')).worksheet(worksheet_name)
