@@ -37,6 +37,8 @@ class SlackClient:
         end_time = datetime.datetime.strptime(end_date, '%Y-%m-%d')
         end_time = datetime.datetime(end_time.year, end_time.month, end_time.day, 23, 59, 59)
         end_time = time.mktime(end_time.timetuple())
+        print('start_time:', start_time)
+        print('end_time:', end_time)
         response = self.client.conversations_history(channel=channel_id, oldest=start_time, latest=end_time)
         return response.data['messages']
 
