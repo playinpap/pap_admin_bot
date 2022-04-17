@@ -26,6 +26,9 @@ pass_member_ids = slack_client.get_emoji_used_member_ids(
 google_sheet_client = GoogelSheetClient()
 worksheet = google_sheet_client.get_worksheet('제출현황')
 data = pd.DataFrame(worksheet.get_all_records())
+raw_data_columns = [column for column in data.columns if column != '차감예치금']
+data = data[raw_data_columns]
+
 data.loc[(data['slackID'].isin(submit_member_ids)) & (data['제출기한'] == due_date), '제출여부'] = 'Y'
 data.loc[(~data['slackID'].isin(submit_member_ids)) & (data['제출기한'] == due_date), '제출여부'] = 'N'
 data.loc[(data['slackID'].isin(pass_member_ids)) & (data['제출기한'] == due_date), '패스사용여부'] = 'Y'
@@ -59,5 +62,5 @@ if datetime.datetime.strptime(feedback_start_date, '%Y-%m-%d') <= datetime.datet
     data.loc[data['제출기한'] == due_date, '피드백대상자2'] = \
         data['slackID'].map(review_assignments_data['피드백대상자2']).fillna('-')
 
-worksheet.update([data.columns.values.tolist()] + data.values.tolist())
+worksheet.update([raw_data_columns] + data.values.tolist())
 print('complete!')
