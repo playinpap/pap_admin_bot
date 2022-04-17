@@ -33,6 +33,11 @@ for submission_date in submission_dates:
         '제출기한': [submission_date] * len(member_names),
         '제출여부': [None] * len(member_names),
         '패스사용여부': [None] * len(member_names),
+        '피드백대상자1': [None] * len(member_names),
+        '피드백여부1': [None] * len(member_names),
+        '피드백대상자2': [None] * len(member_names),
+        '피드백여부2': [None] * len(member_names),
+        '차감예치금': [None] * len(member_names)
     }))
 df = pd.concat(dataframes)
 google_sheet_client = GoogelSheetClient()
