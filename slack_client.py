@@ -33,9 +33,11 @@ class SlackClient:
     def get_channel_messages(self, channel_id, start_date, end_date):
         start_time = datetime.datetime.strptime(start_date, '%Y-%m-%d')
         start_time = datetime.datetime(start_time.year, start_time.month, start_time.day, 0, 0, 0)
+        start_time = start_time - datetime.timedelta(hours=9)
         start_time = time.mktime(start_time.timetuple())
         end_time = datetime.datetime.strptime(end_date, '%Y-%m-%d')
         end_time = datetime.datetime(end_time.year, end_time.month, end_time.day, 23, 59, 59)
+        end_time = end_time - datetime.timedelta(hours=9)
         end_time = time.mktime(end_time.timetuple())
         print('start_time:', start_time)
         print('end_time:', end_time)
