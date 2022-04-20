@@ -6,8 +6,8 @@ import utils
 
 google_sheet_client = GoogelSheetClient()
 sheet = google_sheet_client.get_worksheet('시트6')
-today      = (datetime.today()).strftime('%Y-%m-%d')
-# today = datetime(2021,1,1).strftime('%Y-%m-%d')
+today        = (datetime.today()).strftime('%Y-%m-%d')
+today = datetime(2022,4,18).strftime('%Y-%m-%d')
 sdate, edate = utils.get_posting_dates(sheet, today)
 print("집계일: {} ~ {}".format(sdate, edate))
 
@@ -23,7 +23,11 @@ sheet_slackID     = google_sheet_client.get_worksheet("publisher_info")
 df_slackid        = pd.DataFrame(sheet_slackID.get_all_records())[['성명','slackID']]
 df_thisweek_final = pd.merge(df_thisweek, df_slackid, left_on = '성명', right_on = '성명', how = 'inner')
 
-sheet_posting = google_sheet_client.get_worksheet('블로그게시현황')
-sheet_posting.clear()         # 기존 데이터 삭제
-sheet_posting.update([df_thisweek_final.columns.values.tolist()] + df_thisweek_final.values.tolist())
-print("crawling posts complete!")
+if sdate != pd.to_datetime('1899-01-01'):
+    print("crawling posts complete!")
+    sheet_posting = google_sheet_client.get_worksheet('블로그게시현황')
+    sheet_posting.clear()         # 기존 데이터 삭제
+    sheet_posting.update([df_thisweek_final.columns.values.tolist()] + df_thisweek_final.values.tolist())
+else:
+    print('skip crawling!')
+    
