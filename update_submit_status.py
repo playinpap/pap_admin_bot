@@ -22,8 +22,13 @@ submit_member_ids = slack_client.get_emoji_used_member_ids(
 pass_member_ids = slack_client.get_emoji_used_member_ids(
     channel_id=publisher_channel_id, start_date=beginning_date, end_date=due_date, emoji_name='pass')
 
-# 구글 스프레드 시트 제출현황 업데이트
 google_sheet_client = GoogelSheetClient()
+publisher_info_sheet = google_sheet_client.get_worksheet('publisher_info')
+publisher_info_data = pd.DataFrame(publisher_info_sheet.get_all_records())
+pass_available_members = publisher_info_data.loc[publisher_info_data['잔여패스수'] > 0, 'slackID'].tolist()
+pass_member_ids = [pass_member_id for pass_member_id in pass_member_ids if pass_member_id in pass_available_members]
+
+# 구글 스프레드 시트 제출현황 업데이트
 worksheet = google_sheet_client.get_worksheet('제출현황')
 data = pd.DataFrame(worksheet.get_all_records())
 raw_data_columns = [column for column in data.columns if column != '차감예치금']
