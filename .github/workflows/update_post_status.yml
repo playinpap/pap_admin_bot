@@ -1,13 +1,13 @@
-name: update_submit_status
+name: update_post_status
 on:
   schedule:
-    - cron: '0 3 16 * *'
+    - cron: '0 1 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: run update_submit_status
+    - name: run update_post_status
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         PROJECT_ID: 'pap-deposit-manager'
@@ -19,4 +19,4 @@ jobs:
         SPREADSHEET_NAME: 'PAP 시즌 2 퍼블리셔 제출 현황'
       run: |
         pip install -r requirements.txt
-        python update_submit_status.py
+        python update_post_status.py
