@@ -19,4 +19,4 @@ jobs:
         SPREADSHEET_NAME: 'PAP 시즌 2 퍼블리셔 제출 현황'
       run: |
         pip install -r requirements.txt
-        python update_post_status.py
+        python update_post_status_w_feedback.py
