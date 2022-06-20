@@ -28,12 +28,11 @@ crawling_result = crawling_client.get_posts(authors_page)
 
 df_total, df_thisweek     = crawling_client.get_lastweek_df(crawling_result, last_week = sdate, today = edate)
 
-
-# 구글시트 저장----------------------------------
+# 테이블 형식에 맞게 바꾸기 ------------------------
 sheet_slackID     = google_sheet_client.get_worksheet("publisher_info")
 df_slackid        = pd.DataFrame(sheet_slackID.get_all_records())[['성명','slackID']]
 
-# 저자와 피드백 대상자 1, 2 조인 -> cumcount()로 저자별 리뷰어 수를 센다
+# 저자와 피드백 대상자 1, 2 조인 -> cumcount()로 저자별 리뷰어 수를 세고
 df_long = pd.concat([
     pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자1',how='inner')
     ,pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자2',how='inner')
@@ -56,13 +55,13 @@ df_wide.columns =  ['col' + str(x) for x in np.arange(0,len(df_wide.columns))]
 df_thisweek_feedback_final = (
     pd.merge(
         df_thisweek # 저자 정보
-        , df_wide   # 저자 + 리뷰어 1 ~ 5
+        , df_wide   # 저자 + 리뷰어 1 ~ n
         , left_on = '성명', right_on = 'col0', how="inner")
     .drop('col0', axis=1)
     .replace(np.nan, '', regex=True)
 )
 
-# 데이터 업데이트
+# 데이터 업데이트------------------------------------
 if sdate != pd.to_datetime('1899-01-01'): # 집계일이면 데이터 업데이트
     sheet_posting = google_sheet_client.get_worksheet('블로그게시현황')
     sheet_posting.clear()         # 기존 데이터 삭제
