@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from google_sheet_client import GoogelSheetClient
@@ -9,7 +10,7 @@ google_sheet_client = GoogelSheetClient()
 # 날짜 설정-----------------------------------
 date_sheet = google_sheet_client.get_worksheet('배포날짜')
 today = (datetime.today()).strftime('%Y-%m-%d')
-# today = datetime(2022,6,21).strftime('%Y-%m-%d')
+
 sdate, edate, submit_date = utils.get_posting_dates(date_sheet, today)
 submit_date = submit_date.strftime('%Y-%m-%d')
 
@@ -26,20 +27,42 @@ authors_page    = crawling_client.get_authors_page()
 crawling_result = crawling_client.get_posts(authors_page)
 
 df_total, df_thisweek     = crawling_client.get_lastweek_df(crawling_result, last_week = sdate, today = edate)
-# df_thisweek = df_total.head(5)
+
 
 # 구글시트 저장----------------------------------
 sheet_slackID     = google_sheet_client.get_worksheet("publisher_info")
 df_slackid        = pd.DataFrame(sheet_slackID.get_all_records())[['성명','slackID']]
-df_thisweek_final = pd.merge(df_thisweek, df_slackid, left_on = '성명', right_on = '성명', how = 'inner')
 
-df_feedback_slackid1 = pd.merge(df_feedback, df_slackid, left_on = "피드백대상자1", right_on="성명", how="inner")
-df_feedback_slackid2 = pd.merge(df_feedback_slackid1, df_slackid, left_on = "피드백대상자2", right_on="성명", how="inner")
-df_feedback_slackid  = df_feedback_slackid2.drop(['성명_y', '성명'],axis=1)
+# 저자와 피드백 대상자 1, 2 조인 -> cumcount()로 저자별 리뷰어 수를 센다
+df_long = pd.concat([
+    pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자1',how='inner')
+    ,pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자2',how='inner')
+],axis=0).sort_values("성명_x")
+df_long['idx'] = df_long.groupby('성명_x').cumcount()
 
-df_thisweek_feedback = pd.merge(df_thisweek_final, df_feedback_slackid, left_on="성명", right_on="성명_x", how="inner")
-df_thisweek_feedback_final = df_thisweek_feedback.drop(["성명_x", "제출기한"],axis=1)
+# long -> wide로 변경
+df_wide = df_long.pivot(index='성명_x',columns='idx', values='성명_y').reset_index()
 
+# 저자 & 리뷰어들의 slackid 조인
+for i in range(df_wide.shape[1]):
+    df_temp = pd.merge(df_wide, df_slackid, left_on = df_wide.columns[i], right_on = '성명', how = 'left')
+    df_wide = df_temp
+
+# 6번째 정보부터 가져와서 column 이름 붙이기
+df_wide = df_wide.iloc[:,6:]
+df_wide.columns =  ['col' + str(x) for x in np.arange(0,len(df_wide.columns))]
+
+# 최종 테이블
+df_thisweek_feedback_final = (
+    pd.merge(
+        df_thisweek # 저자 정보
+        , df_wide   # 저자 + 리뷰어 1 ~ 5
+        , left_on = '성명', right_on = 'col0', how="inner")
+    .drop('col0', axis=1)
+    .replace(np.nan, '', regex=True)
+)
+
+# 데이터 업데이트
 if sdate != pd.to_datetime('1899-01-01'): # 집계일이면 데이터 업데이트
     sheet_posting = google_sheet_client.get_worksheet('블로그게시현황')
     sheet_posting.clear()         # 기존 데이터 삭제
@@ -48,5 +71,4 @@ if sdate != pd.to_datetime('1899-01-01'): # 집계일이면 데이터 업데이�
     print("crawling posts complete!")
 else: #집계일이 아니면 skip
     print('skip crawling!')
-    
 
