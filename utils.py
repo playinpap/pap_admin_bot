@@ -16,12 +16,14 @@ def get_posting_dates(sheet, today):
     cond = (pd.to_datetime(df_duedate['edate']) == today)
     sdate = (df_duedate[cond])['sdate']
     edate = (df_duedate[cond])['edate']
-    
+    submit_date = (df_duedate[cond])['submit_date']
     if sum(cond) > 0:
-        start_date = datetime.datetime.strptime(sdate.item(), '%Y-%m-%d')  
-        end_date   = datetime.datetime.strptime(edate.item(), '%Y-%m-%d')
+        start_date    = datetime.datetime.strptime(sdate.item(), '%Y-%m-%d')  
+        end_date      = datetime.datetime.strptime(edate.item(), '%Y-%m-%d')
+        submit_date   = datetime.datetime.strptime(submit_date.item(), '%Y-%m-%d')
+
     else:
-        start_date = datetime.datetime.strptime('1899-01-01', '%Y-%m-%d') 
-        end_date   = datetime.datetime.strptime('1899-01-01', '%Y-%m-%d') 
-    
-    return start_date, end_date
+        start_date    = datetime.datetime.strptime('1899-01-01', '%Y-%m-%d') 
+        end_date      = datetime.datetime.strptime('1899-01-01', '%Y-%m-%d') 
+        submit_date   = datetime.datetime.strptime('1899-01-01', '%Y-%m-%d')
+    return start_date, end_date, submit_date
