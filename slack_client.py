@@ -1,11 +1,13 @@
 import os
 import datetime
+import re
 from tracemalloc import start
 from pytz import timezone
 import time
 from pathlib import Path
 
 from dotenv import load_dotenv
+import pandas as pd
 import slack_sdk 
 
 
@@ -16,6 +18,7 @@ import slack_sdk
 class SlackClient:
     def __init__(self):
         self.client = slack_sdk.WebClient(token=os.environ.get('SLACK_BOT_TOKEN'))
+        self.bot_member_id = 'B038XBVR57V'
 
     def get_channel_id(self, channel_name):
         channel_infos = self.client.conversations_list()
@@ -62,3 +65,46 @@ class SlackClient:
                 response = self.client.chat_getPermalink(channel=channel_id, message_ts=message['ts'])
                 submit_links[message['user']] = response.data['permalink']
         return submit_links
+
+    def get_notice_message(self, channel_id, start_date, end_date):
+        messages = self.get_channel_messages(
+            channel_id=channel_id, start_date=start_date, end_date=end_date)
+        bot_messages = [message for message in messages
+            if ('bot_id' in message) and (message['bot_id'] == self.bot_member_id)]
+        if len(bot_messages) <= 0:
+            raise Exception(f'PAP 피드백봇을 찾을 수 없습니다.(기간: {start_date}-{end_date})')
+        return bot_messages[-1]
+
+    def get_feedback_assignments_data(self, notice_message):
+        feedback_assignments = []
+        lines = notice_message['text'].split('\n')
+        lines = [line for line in lines if '•' in line]
+        for line in lines:
+            mentions = re.findall('\<@(.*?)\>', line)
+            reviewers = mentions[:-1]
+            reviewee = mentions[-1]
+            for reviewer in reviewers:
+                feedback_assignments.append({
+                    'reviewer': reviewer,
+                    'reviewee': reviewee,
+                    'feedback_done': 'N'
+                })
+        return pd.DataFrame(feedback_assignments)
+
+    def get_replies(self, channel_id, thread_timestamp):
+        response = self.client.conversations_replies(
+            channel=channel_id, ts=thread_timestamp)
+        return [message for message in response.data['messages'] if message.get('subtype') != 'bot_message']
+
+    def get_feedbacks(self, channel_id, thread_timestamp):
+        response = self.client.conversations_replies(
+            channel=channel_id, ts=thread_timestamp)
+        replies = [message for message in response.data['messages'] if message.get('subtype') != 'bot_message']
+        feedbacks = []
+        for reply in replies:
+            if 'reactions' not in reply:
+                continue
+            emojis = set([reaction['name'] for reaction in reply['reactions']])
+            if 'feedback' in emojis:
+                feedbacks.append(reply)
+        return feedbacks

@@ -1,0 +1,22 @@
+name: update_feedback_status
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: run update_feedback_status
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        PROJECT_ID: 'pap-deposit-manager'
+        PRIVATE_KEY_ID: ${{ secrets.PRIVATE_KEY_ID }}
+        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        CLIENT_EMAIL: 'pap-deposit-manager@pap-deposit-manager.iam.gserviceaccount.com'
+        CLIENT_ID: '101609940419405544892'
+        CLIENT_CERT_URL: 'https://www.googleapis.com/robot/v1/metadata/x509/pap-deposit-manager%40pap-deposit-manager.iam.gserviceaccount.com'
+        SPREADSHEET_NAME: 'PAP 시즌 2 퍼블리셔 제출 현황'
+      run: |
+        pip install -r requirements.txt
+        python update_feedback_status.py
