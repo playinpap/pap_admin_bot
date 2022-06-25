@@ -1,7 +1,7 @@
 name: update_submit_status
 on:
   schedule:
-    - cron: '0 3 16 * *'
+    - cron: '0 17 15 * *'
 jobs:
   build:
     runs-on: ubuntu-latest
