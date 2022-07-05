@@ -10,10 +10,9 @@ google_sheet_client = GoogelSheetClient()
 # 날짜 설정-----------------------------------
 date_sheet = google_sheet_client.get_worksheet('배포날짜')
 today = (datetime.today()).strftime('%Y-%m-%d')
-
+# today = datetime(2022,6,21).strftime('%Y-%m-%d')
 sdate, edate, submit_date = utils.get_posting_dates(date_sheet, today)
 submit_date = submit_date.strftime('%Y-%m-%d')
-
 print(" 제출일: {}, 집계일: {} ~ {}".format(submit_date,sdate, edate))
 
 # 피드백 대상자 확인 ----------------------------
@@ -34,8 +33,8 @@ df_slackid        = pd.DataFrame(sheet_slackID.get_all_records())[['성명','sla
 
 # 저자와 피드백 대상자 1, 2 조인 -> cumcount()로 저자별 리뷰어 수를 세고
 df_long = pd.concat([
-    pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자1',how='inner')
-    ,pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자2',how='inner')
+    pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자1',how='left')
+    ,pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자2',how='left')
 ],axis=0).sort_values("성명_x")
 df_long['idx'] = df_long.groupby('성명_x').cumcount()
 
@@ -44,18 +43,19 @@ df_wide = df_long.pivot(index='성명_x',columns='idx', values='성명_y').reset
 
 # 저자 & 리뷰어들의 slackid 조인
 for i in range(df_wide.shape[1]):
-    df_temp = pd.merge(df_wide, df_slackid, left_on = df_wide.columns[i], right_on = '성명', how = 'left')
+    df_temp = pd.merge(df_wide, df_slackid, left_on = df_wide.columns[i], right_on = '성명', how = 'inner')
     df_wide = df_temp
 
-# 6번째 정보부터 가져와서 column 이름 붙이기
-df_wide = df_wide.iloc[:,6:]
-df_wide.columns =  ['col' + str(x) for x in np.arange(0,len(df_wide.columns))]
+# 조인 후 중복 컬럼 제외하기 author 성명, author slackid, slackid 1, slackid 2, ...
+authors = pd.DataFrame(df_wide.iloc[:,0])
+df_wide2 = pd.concat([authors, df_wide.loc[:,~df_wide.T.duplicated()].filter(regex=("slack.*"))], axis=1)
+df_wide2.columns =  ['col' + str(x) for x in np.arange(0,len(df_wide2.columns))]
 
 # 최종 테이블
 df_thisweek_feedback_final = (
     pd.merge(
-        df_thisweek # 저자 정보
-        , df_wide   # 저자 + 리뷰어 1 ~ n
+        df_thisweek  # 저자 정보
+        , df_wide2   # 저자 + 리뷰어 1 ~ n
         , left_on = '성명', right_on = 'col0', how="inner")
     .drop('col0', axis=1)
     .replace(np.nan, '', regex=True)
