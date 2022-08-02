@@ -47,6 +47,7 @@ df_long['idx'] = df_long.groupby('성명_x').cumcount()
 
 # long -> wide로 변경
 df_wide = df_long.pivot(index='성명_x',columns='idx', values='성명_y').reset_index()
+df_wide.head(1)
 
 # 저자 & 리뷰어들의 slackid 조인
 for i in range(df_wide.shape[1]):
@@ -57,6 +58,7 @@ for i in range(df_wide.shape[1]):
 authors = pd.DataFrame(df_wide.iloc[:,0])
 df_wide2 = pd.concat([authors, df_wide.loc[:,~df_wide.T.duplicated()].filter(regex=("slack.*"))], axis=1)
 df_wide2.columns =  ['col' + str(x) for x in np.arange(0,len(df_wide2.columns))]
+df_wide2.head(1)
 
 # 최종 테이블
 df_thisweek_feedback_final = (
