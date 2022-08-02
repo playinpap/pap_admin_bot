@@ -1,3 +1,7 @@
+#------------------------------------------
+# 수정 사항
+# 2022-08-22 피드백봇 실패 -> 피드백 대상자 1,2에 NaN이 있어서 오류 ->inner join으로 수정
+#------------------------------------------
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
@@ -31,11 +35,14 @@ df_total, df_thisweek     = crawling_client.get_lastweek_df(crawling_result, las
 sheet_slackID     = google_sheet_client.get_worksheet("publisher_info")
 df_slackid        = pd.DataFrame(sheet_slackID.get_all_records())[['성명','slackID']]
 
-# 저자와 피드백 대상자 1, 2 조인 -> cumcount()로 저자별 리뷰어 수를 세고
-df_long = pd.concat([
-    pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자1',how='left')
-    ,pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자2',how='left')
-],axis=0).sort_values("성명_x")
+# 저자와 피드백 대상자 1, 2 inner 조인 -> cumcount()로 저자별 리뷰어 수를 세고
+df_long = (pd.concat([
+    pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자1',how='inner')
+    ,pd.merge(df_thisweek, df_feedback, left_on = '성명', right_on='피드백대상자2',how='inner')
+    ],axis=0)
+    .sort_values("성명_x").drop(['피드백대상자1','피드백대상자2','제출기한'],axis=1)
+)
+
 df_long['idx'] = df_long.groupby('성명_x').cumcount()
 
 # long -> wide로 변경
@@ -43,7 +50,7 @@ df_wide = df_long.pivot(index='성명_x',columns='idx', values='성명_y').reset
 
 # 저자 & 리뷰어들의 slackid 조인
 for i in range(df_wide.shape[1]):
-    df_temp = pd.merge(df_wide, df_slackid, left_on = df_wide.columns[i], right_on = '성명', how = 'inner')
+    df_temp = pd.merge(df_wide, df_slackid, left_on = df_wide.columns[i], right_on = '성명', how = 'left')
     df_wide = df_temp
 
 # 조인 후 중복 컬럼 제외하기 author 성명, author slackid, slackid 1, slackid 2, ...
