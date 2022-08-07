@@ -6,3 +6,4 @@ slack_sdk
 oauth2client
 bs4
 requests
+tabulate
