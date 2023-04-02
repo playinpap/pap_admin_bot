@@ -1,0 +1,28 @@
+# Vscode REST Client 에서 Contentful API 요청 테스트를 수행하기 위한 스크립트
+# 참고. https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+### .env 파일에서 Content Managemennt API 토큰 가져오기
+@cma-token = {{$dotenv CONTENTFUL_CMA_TOKEN}}
+
+# @name space
+GET https://api.contentful.com/spaces
+Authorization: Bearer {{cma-token}}
+
+### environment 정보 가져오기
+@space-id = {{space.response.body.$.items[0].sys.id}}
+# @name environments
+GET https://api.contentful.com/spaces/{{space-id}}/environments
+Authorization: Bearer {{cma-token}}
+
+### Author 정보 가져오기
+@environment-id = {{environments.response.body.$.items[0].sys.id}}
+GET https://api.contentful.com/spaces/{{space-id}}/environments/{{environment-id}}/public/entries
+    ?content_type=author
+Authorization: Bearer {{cma-token}}
+
+
+### 퍼블리시된 Article 가져오기
+@environment-id = {{environments.response.body.$.items[0].sys.id}}
+GET https://api.contentful.com/spaces/{{space-id}}/environments/{{environment-id}}/public/entries
+    ?content_type=article
+Authorization: Bearer {{cma-token}}
