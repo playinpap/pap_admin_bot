@@ -58,7 +58,7 @@ sample_authors = [
     {'name': '권남택', 'slug': 'namtaek', 'author-id': '6gHoqLPPbdiyxIQ0MTZNa8'}, 
     {'name': '김민겸', 'slug': 'minkim', 'author-id': '4F228o8FrZYEvwT8U9ZD3h'}, 
     {'name': '누리', 'slug': 'nuli', 'author-id': '58lKCEp8UM5xTzRrugtjm1'}, 
-    {'name': '이웅원', 'slug': None, 'author-id': '5WRi9m1YguzzfMxSQT651e'}, 
+    {'name': '이웅원', 'slug': 'dnddnjs11', 'author-id': '5WRi9m1YguzzfMxSQT651e'}, 
     {'name': '이창현', 'slug': 'changhyun.lee', 'author-id': '30ylK3Wl9yg2YdyNlM9L9S'}, 
     {'name': '홍선아', 'slug': 'soosunnaa', 'author-id': 'er9x59t9LsxaOcwxhjtft'}, 
     {'name': '이인영', 'slug': 'nathan', 'author-id': '21xsO5PvrYaKjyLIa4DfMI'}, 
@@ -112,6 +112,10 @@ def filter_articles_by_duedate(articles: list, due_start_date: str, due_end_date
             result.append(article)
     return result
 
-test = get_contentful_articles()
-test = filter_articles_by_duedate(test, '2023-03-20', '2023-04-03')
-pprint(test)
+# authors = get_contentful_authors()
+# pprint(authors)
+# articles = get_contentful_articles()
+# articles = filter_articles_by_duedate(articles, '2023-03-20', '2023-04-06')
+
+# feedbacks = get_feedback_candidates(authors, articles)
+# pprint(feedbacks)
