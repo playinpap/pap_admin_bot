@@ -26,6 +26,10 @@ def get_worksheet(svc_account, spreadsheet: str, worksheet: str):
     sheet = svc_account.open(spreadsheet).worksheet(worksheet)
     return sheet.get_all_records()
 
+def insert_worksheet(svc_account, spreadsheet: str, worksheet: str, data: list):
+    sheet = svc_account.open(spreadsheet).worksheet(worksheet)
+    return sheet.append_row(data)
+
 # google_svc_account = get_gspread_service_account()
 # data = get_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
 # pprint(data)
