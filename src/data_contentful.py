@@ -92,7 +92,7 @@ def get_contentful_authors() -> list:
 
 def filter_articles_by_duedate(articles: list, due_start_date: str, due_end_date:str) -> list:
     """
-    - CMS에서 퍼블리시한 날짜와 포스팅에 표기되는 게시글 날짜 모두가 due_start_date <= target <= due_end_date 에 포함되어야 한다.
+    - 포스팅에 표기되는 게시글 날짜가 due_start_date <= target <= due_end_date 에 포함되어야 한다.
     - 정책으로 due_start_date 는 이전 배포일+1 이 되는 것이 좋다. (첫배포시에는 배포 2주 전쯤)
     """
     start_dt = datetime.strptime(due_start_date, '%Y-%m-%d')
@@ -106,9 +106,9 @@ def filter_articles_by_duedate(articles: list, due_start_date: str, due_end_date
     result = []
     for article in articles:
         # published_dt: 2023-03-25T05:43:12.189Z -> 2023-03-25 14:43:12.189000+09:00
-        published_dt = datetime.strptime(article['published_at'], '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=kst_tz) + timedelta(hours=9)
+        # published_dt = datetime.strptime(article['published_at'], '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=kst_tz) + timedelta(hours=9)
         article_dt = datetime.strptime(article['date'], '%Y-%m-%dT%H:%M%z')
-        if start_dt <= published_dt <= end_dt and start_dt <= article_dt <= end_dt:
+        if start_dt <= article_dt <= end_dt:
             result.append(article)
     return result
 
