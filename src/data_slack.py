@@ -3,6 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from slack_sdk import WebClient
 from typing import List, Dict
+from datetime import datetime
 
 from pprint import pprint
 
@@ -11,6 +12,12 @@ load_dotenv(dotenv_path=env_path)
 
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 # SLACK_BOT_TOKEN = os.environ.get('SLACK_BOT_TOKEN')
+
+def timestamp_to_date(timestamp: float) -> str:
+    """
+    Slack의 timestamp 값을 %Y-%m-%d %H:%M:%S 포맷의 문자열로 반환합니다.
+    """
+    return datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
 def get_slack_client(token:str) -> WebClient:
     return WebClient(token=token)
@@ -80,11 +87,11 @@ def get_replies_from_ts(client: WebClient, channel_id:str, ts: str) -> dict:
         reactions_from_replier = list(filter(lambda r: reply['user'] in r['users'], reactions))
         emojis_from_replier = [reply['name'] for reply in reactions_from_replier]
         return emojis_from_replier
-    
     result = [{
         'user': reply['user'],
-        'reactions': extract_reactions_from_reply(reply)
+        'reactions': extract_reactions_from_reply(reply),
+        'time': timestamp_to_date(float(reply['ts']))
         } for reply in replies]
     return result
 
-pprint(get_replies_from_ts(client, 'C04SJDDSYHG', '1679727644.463259'))
+# pprint(get_replies_from_ts(client, 'C04SJDDSYHG', '1680698243.235909'))
