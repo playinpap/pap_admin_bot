@@ -30,6 +30,13 @@ def insert_worksheet(svc_account, spreadsheet: str, worksheet: str, data: list):
     sheet = svc_account.open(spreadsheet).worksheet(worksheet)
     return sheet.append_row(data)
 
+def delete_worksheet_contents(svc_account, spreadsheet: str, worksheet: str):
+    '''
+    Header row를 제외한 나머지 컨텐츠를 제거합니다.
+    '''
+    sheet = svc_account.open(spreadsheet).worksheet(worksheet)
+    sheet.batch_clear(['A2:Z'])
+
 # google_svc_account = get_gspread_service_account()
 # data = get_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
 # pprint(data)
