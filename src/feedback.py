@@ -17,12 +17,17 @@ def get_feedback_candidates(authors: list, articles: list, seed: str = 'abc') ->
         result.append(feedback_result)
     return result
 
-def run_feedback():
+def run_feedback(start_dt: str, end_dt: str) -> list:
+    '''
+    example
+    ---
+    feedbacks = run_feedback('2023-03-20', '2023-04-06')
+    '''
     google_svc_account = get_gspread_service_account()
     publishers = get_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
 
     articles = get_contentful_articles()
-    articles = filter_articles_by_duedate(articles, '2023-03-20', '2023-04-06')
+    articles = filter_articles_by_duedate(articles, start_dt, end_dt)
 
     feedbacks = get_feedback_candidates(publishers, articles)
     feedbacks_result = [{
@@ -39,5 +44,8 @@ def prettify_feedback_msg(feedbacks: list) -> list:
     for msg in msgs:
         print(msg)
 
-feedbacks = run_feedback()
-prettify_feedback_msg(feedbacks)
+if __name__ == '__main__':
+    START_DT = '2023-03-20'
+    END_DT = '2023-04-06'
+    feedbacks = run_feedback(START_DT, END_DT)
+    prettify_feedback_msg(feedbacks)
