@@ -20,9 +20,7 @@ def run_feedback_checker(slack_token: str, channel_id: str, thread_ts: str, post
     ]
 
     google_svc_account = get_gspread_service_account()
-
-    for feedback in feedbacks:
-        insert_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_feedbacks', feedback)
+    insert_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_feedbacks', feedbacks)
     
     print('[Done]')
 

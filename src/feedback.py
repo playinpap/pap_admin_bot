@@ -1,6 +1,6 @@
 import random
 from pprint import pprint
-from data_contentful import get_contentful_articles, filter_articles_by_duedate
+from data_contentful import get_target_articles, get_contentful_articles, filter_articles_by_duedate
 from data_sheet import get_gspread_service_account, get_worksheet
 
 
@@ -26,8 +26,7 @@ def run_feedback(start_dt: str, end_dt: str) -> list:
     google_svc_account = get_gspread_service_account()
     publishers = get_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
 
-    articles = get_contentful_articles()
-    articles = filter_articles_by_duedate(articles, start_dt, end_dt)
+    articles = get_target_articles(start_dt, end_dt)
 
     feedbacks = get_feedback_candidates(publishers, articles)
     feedbacks_result = [{
@@ -45,6 +44,7 @@ def prettify_feedback_msg(feedbacks: list) -> list:
         print(msg)
 
 if __name__ == '__main__':
+    # 1회차: 2023-03-20 , 2023-04-06
     START_DT = '2023-03-20'
     END_DT = '2023-04-06'
     feedbacks = run_feedback(START_DT, END_DT)

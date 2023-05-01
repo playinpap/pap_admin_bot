@@ -3,10 +3,6 @@ import json
 from data_sheet import get_gspread_service_account, get_worksheet, insert_worksheet, delete_worksheet_contents
 
 
-def get_sheets(spreadsheet: str, worksheet: str, account_getter: callable = get_gspread_service_account):
-    google_svc_account = account_getter()
-    return get_worksheet(google_svc_account, spreadsheet, worksheet)
-
 def merge_deposits(publishers, posts, feedbacks):
     # DuckDB 에서 쉽게 읽을 수 있도록 json 파일로 변환
     with open('/tmp/publishers.json', 'w') as outfile:
@@ -55,23 +51,22 @@ def merge_deposits(publishers, posts, feedbacks):
 
     return results
 
-def upload_deposits(data: list, account_getter: callable = get_gspread_service_account):
+def upload_deposits(svc_account, data: list):
     spreadsheet = 'PAP 시즌 2 퍼블리셔 제출 현황'
     worksheet = 'season3_deposits'
-    google_svc_account = account_getter()
     # Header 를 제외한 다른 행 삭제
-    delete_worksheet_contents(google_svc_account, spreadsheet, worksheet)
+    delete_worksheet_contents(svc_account, spreadsheet, worksheet)
     # 멤버별 예치금 정보 업데이트
-    for row in data:
-        insert_worksheet(google_svc_account, spreadsheet, worksheet, row)
+    insert_worksheet(svc_account, spreadsheet, worksheet, data)
 
 def run_calculate_deposits():
-    publishers = get_sheets('PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
-    posts = get_sheets('PAP 시즌 2 퍼블리셔 제출 현황', 'season3_posts')
-    feedbacks = get_sheets('PAP 시즌 2 퍼블리셔 제출 현황', 'season3_feedbacks')
+    svc_account = get_gspread_service_account()
+    publishers = get_worksheet(svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
+    posts = get_worksheet(svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_posts')
+    feedbacks = get_worksheet(svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_feedbacks')
     
     deposits = merge_deposits(publishers, posts, feedbacks)
-    upload_deposits(deposits)
+    upload_deposits(svc_account, deposits)
 
 
 if __name__ == '__main__':

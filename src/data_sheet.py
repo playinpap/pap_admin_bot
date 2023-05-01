@@ -3,6 +3,7 @@ import gspread
 from pathlib import Path
 from dotenv import load_dotenv
 from pprint import pprint
+from typing import List
 
 env_path = Path('.') / '.env'
 load_dotenv(dotenv_path=env_path)
@@ -26,9 +27,13 @@ def get_worksheet(svc_account, spreadsheet: str, worksheet: str):
     sheet = svc_account.open(spreadsheet).worksheet(worksheet)
     return sheet.get_all_records()
 
-def insert_worksheet(svc_account, spreadsheet: str, worksheet: str, data: list):
+def insert_worksheet(svc_account, spreadsheet: str, worksheet: str, data: List[list]):
+    '''
+    시트에 데이터를 추가합니다.
+    '''
     sheet = svc_account.open(spreadsheet).worksheet(worksheet)
-    return sheet.append_row(data)
+    for row in data:
+        sheet.append_row(row)
 
 def delete_worksheet_contents(svc_account, spreadsheet: str, worksheet: str):
     '''
@@ -36,7 +41,3 @@ def delete_worksheet_contents(svc_account, spreadsheet: str, worksheet: str):
     '''
     sheet = svc_account.open(spreadsheet).worksheet(worksheet)
     sheet.batch_clear(['A2:Z'])
-
-# google_svc_account = get_gspread_service_account()
-# data = get_worksheet(google_svc_account, 'PAP 시즌 2 퍼블리셔 제출 현황', 'season3_publisher')
-# pprint(data)
