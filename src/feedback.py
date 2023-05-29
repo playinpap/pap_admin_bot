@@ -44,8 +44,11 @@ def prettify_feedback_msg(feedbacks: list) -> list:
         print(msg)
 
 if __name__ == '__main__':
+    # poetry run python src/feedback.py
     # 1회차: 2023-03-20 , 2023-04-06
-    START_DT = '2023-03-20'
-    END_DT = '2023-04-06'
+    # 2회차:
+    # 3회차: 2023-05-03 , 2023-05-30
+    START_DT = '2023-05-03'
+    END_DT = '2023-05-30'
     feedbacks = run_feedback(START_DT, END_DT)
     prettify_feedback_msg(feedbacks)

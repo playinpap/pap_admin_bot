@@ -20,11 +20,13 @@ def run_upload_posts(post_group: int, due_start_date: str, due_end_date: str, de
 
 
 if __name__ == '__main__':
+    # poetry run python src/post.py
     # TODO : CLI에서 직접 실행할 경우 커맨드라인으로 명령어 받아서 커스텀으로 돌릴 수 있게 하기
     env_path = Path('.') / '.env'
     load_dotenv(dotenv_path=env_path)
     
     # 1, 2023-03-20, 2023-04-06
     # 2, 2023-04-07, 2023-05-01
-    POST_GROUP = 2 # 업로드 주차마다 1씩 올려야 함
-    run_upload_posts(POST_GROUP, '2023-04-07', '2023-05-02')
+    # 3, 2023-05-03, 2023-05-30
+    POST_GROUP = 3 # 업로드 주차마다 1씩 올려야 함
+    run_upload_posts(POST_GROUP, '2023-05-03', '2023-05-30')

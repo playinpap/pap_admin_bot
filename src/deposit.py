@@ -70,4 +70,5 @@ def run_calculate_deposits():
 
 
 if __name__ == '__main__':
+    # poetry run python src/deposit.py
     run_calculate_deposits()
