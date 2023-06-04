@@ -32,10 +32,11 @@ if __name__ == '__main__':
 
     # POST_GROUP=1  https://playinpap.slack.com/archives/C04SJDDSYHG/p1680698243235909  =>  1680698243.235909
     # POST_GROUP=2  https://playinpap.slack.com/archives/C04SJDDSYHG/p1683156600730909  =>  1683156600.730909
-    
+    # POST_GROUP=3  https://playinpap.slack.com/archives/C04SJDDSYHG/p1685376305481739  =>  1685376305.481739
+
     SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
     CHANNEL_ID = 'C04SJDDSYHG'
-    THREAD_TS = '1683156600.730909'
-    POST_GROUP = 2 # 업로드 주차마다 1씩 올려야 함
+    THREAD_TS = '1685376305.481739'
+    POST_GROUP = 3 # 업로드 주차마다 1씩 올려야 함
 
     run_feedback_checker(SLACK_BOT_TOKEN, CHANNEL_ID, THREAD_TS, POST_GROUP)
